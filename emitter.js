@@ -1,5 +1,26 @@
 'use strict';
 
+class Emitter {
+    constructor(context, handler, times, frequency) {
+        this.context = context;
+        this.handler = handler;
+        this.times = times <= 0 ? Infinity : times;
+        this.frequency = frequency <= 0 ? 1 : frequency;
+        this.counter = 0;
+    }
+
+    static createEmitter(context, handler, times = Infinity, frequency = 1) {
+        return new Emitter(context, handler, times, frequency);
+    }
+
+    emit() {
+        if (this.counter < this.times && (this.counter % this.frequency) === 0) {
+            this.handler.call(this.context);
+        }
+        this.counter++;
+    }
+}
+
 /**
  * Сделано задание на звездочку
  * Реализованы методы several и through
@@ -11,6 +32,39 @@ const isStar = true;
  * @returns {Object}
  */
 function getEmitter() {
+    let map = new Map();
+
+    function addEvent(event, emitter) {
+        if (map.has(event)) {
+            map.get(event).push(emitter);
+        } else {
+            map.set(event, [emitter]);
+        }
+    }
+
+    function deleteContext(event, context) {
+        if (map.has(event)) {
+            map.set(event, map.get(event).filter(without, context));
+        }
+    }
+
+    function takeEvents(event) {
+        let result = [];
+        while (event.indexOf('.') > 0) {
+            result.push(event);
+            event = event.slice(0, event.indexOf('.'));
+        }
+        result.push(event);
+
+        return result;
+    }
+
+    function without(context) {
+        console.info(this);
+
+        return context !== this.context;
+    }
+
     return {
 
         /**
@@ -18,26 +72,50 @@ function getEmitter() {
          * @param {String} event
          * @param {Object} context
          * @param {Function} handler
+         * @returns {object}
          */
         on: function (event, context, handler) {
             console.info(event, context, handler);
+
+            addEvent(event, Emitter.createEmitter(context, handler));
+
+            return this;
         },
 
         /**
          * Отписаться от события
          * @param {String} event
          * @param {Object} context
+         * @returns {object}
          */
         off: function (event, context) {
             console.info(event, context);
+
+            for (let key of map.keys()) {
+                if (key === event || key.startsWith(event + '.')) {
+                    deleteContext(key, context);
+                }
+            }
+
+            return this;
         },
 
         /**
          * Уведомить о событии
          * @param {String} event
+         * @returns {object}
          */
         emit: function (event) {
             console.info(event);
+
+            takeEvents(event).forEach(x => {
+                if (!map.has(x)) {
+                    return;
+                }
+                map.get(x).forEach(em => em.emit());
+            });
+
+            return this;
         },
 
         /**
@@ -47,9 +125,16 @@ function getEmitter() {
          * @param {Object} context
          * @param {Function} handler
          * @param {Number} times – сколько раз получить уведомление
+         * @returns {object}
          */
         several: function (event, context, handler, times) {
             console.info(event, context, handler, times);
+
+            takeEvents(event).forEach(x => {
+                addEvent(x, Emitter.createEmitter(context, handler, times));
+            });
+
+            return this;
         },
 
         /**
@@ -59,9 +144,16 @@ function getEmitter() {
          * @param {Object} context
          * @param {Function} handler
          * @param {Number} frequency – как часто уведомлять
+         * @returns {object}
          */
         through: function (event, context, handler, frequency) {
             console.info(event, context, handler, frequency);
+
+            takeEvents(event).forEach(x => {
+                addEvent(x, Emitter.createEmitter(context, handler, 1, frequency));
+            });
+
+            return this;
         }
     };
 }
