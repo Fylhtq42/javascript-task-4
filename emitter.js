@@ -90,7 +90,7 @@ function getEmitter() {
             console.info(event, context);
 
             for (let key of map.keys()) {
-                if (key === event || key.startsWith(event + '.')) {
+                if (takeEvents(key).includes(event)) {
                     deleteContext(key, context);
                 }
             }
