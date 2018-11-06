@@ -60,9 +60,7 @@ function getEmitter() {
     }
 
     function without(context) {
-        console.info(this);
-
-        return context !== this.context;
+        return context.context !== this;
     }
 
     return {
@@ -72,7 +70,7 @@ function getEmitter() {
          * @param {String} event
          * @param {Object} context
          * @param {Function} handler
-         * @returns {object}
+         * @returns {Object}
          */
         on: function (event, context, handler) {
             console.info(event, context, handler);
@@ -86,7 +84,7 @@ function getEmitter() {
          * Отписаться от события
          * @param {String} event
          * @param {Object} context
-         * @returns {object}
+         * @returns {Object}
          */
         off: function (event, context) {
             console.info(event, context);
@@ -103,7 +101,7 @@ function getEmitter() {
         /**
          * Уведомить о событии
          * @param {String} event
-         * @returns {object}
+         * @returns {Object}
          */
         emit: function (event) {
             console.info(event);
@@ -125,14 +123,12 @@ function getEmitter() {
          * @param {Object} context
          * @param {Function} handler
          * @param {Number} times – сколько раз получить уведомление
-         * @returns {object}
+         * @returns {Object}
          */
         several: function (event, context, handler, times) {
             console.info(event, context, handler, times);
 
-            takeEvents(event).forEach(x => {
-                addEvent(x, Emitter.createEmitter(context, handler, times));
-            });
+            addEvent(event, Emitter.createEmitter(context, handler, times));
 
             return this;
         },
@@ -144,14 +140,12 @@ function getEmitter() {
          * @param {Object} context
          * @param {Function} handler
          * @param {Number} frequency – как часто уведомлять
-         * @returns {object}
+         * @returns {Object}
          */
         through: function (event, context, handler, frequency) {
             console.info(event, context, handler, frequency);
 
-            takeEvents(event).forEach(x => {
-                addEvent(x, Emitter.createEmitter(context, handler, 1, frequency));
-            });
+            addEvent(event, Emitter.createEmitter(context, handler, Infinity, frequency));
 
             return this;
         }
