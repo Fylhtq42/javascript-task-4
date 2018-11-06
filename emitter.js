@@ -128,7 +128,7 @@ function getEmitter() {
         several: function (event, context, handler, times) {
             console.info(event, context, handler, times);
 
-            addEvent(event, Emitter.createEmitter(context, handler, times));
+            addEvent(event, Emitter.createEmitter(context, handler, times, 1));
 
             return this;
         },
