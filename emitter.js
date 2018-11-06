@@ -25,7 +25,7 @@ class Emitter {
  * Сделано задание на звездочку
  * Реализованы методы several и through
  */
-const isStar = false;
+const isStar = true;
 
 /**
  * Возвращает новый emitter
@@ -44,7 +44,7 @@ function getEmitter() {
 
     function deleteContext(event, context) {
         if (map.has(event)) {
-            map.set(event, map.get(event).filter(without, context));
+            map.set(event, map.get(event).filter(e => e.context !== context));
         }
     }
 
@@ -52,15 +52,11 @@ function getEmitter() {
         let result = [];
         while (event.indexOf('.') > 0) {
             result.push(event);
-            event = event.slice(0, event.indexOf('.'));
+            event = event.slice(0, event.lastIndexOf('.'));
         }
         result.push(event);
 
         return result;
-    }
-
-    function without(context) {
-        return context.context !== this;
     }
 
     return {
