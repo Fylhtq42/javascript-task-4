@@ -4,8 +4,8 @@ class Emitter {
     constructor(context, handler, times, frequency) {
         this.context = context;
         this.handler = handler;
-        this.times = times <= 0 ? Infinity : times;
-        this.frequency = frequency <= 0 ? 1 : frequency;
+        this.times = times < 1 ? Infinity : times;
+        this.frequency = frequency < 1 ? 1 : frequency;
         this.counter = 0;
     }
 
@@ -128,7 +128,7 @@ function getEmitter() {
         several: function (event, context, handler, times) {
             console.info(event, context, handler, times);
 
-            addEvent(event, Emitter.createEmitter(context, handler, times, 1));
+            addEvent(event, Emitter.createEmitter(context, handler, times));
 
             return this;
         },
