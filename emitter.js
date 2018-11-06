@@ -5,7 +5,7 @@ class Emitter {
         this.context = context;
         this.handler = handler;
         this.times = times < 1 ? Infinity : times;
-        this.frequency = frequency < 1 ? 1 : frequency;
+        this.frequency = Math.max(1, frequency);
         this.counter = 0;
     }
 
@@ -25,7 +25,7 @@ class Emitter {
  * Сделано задание на звездочку
  * Реализованы методы several и through
  */
-const isStar = true;
+const isStar = false;
 
 /**
  * Возвращает новый emitter
